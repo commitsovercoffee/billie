@@ -16,7 +16,7 @@
 		},
 		bankDetails: {
 			accountNumber: '9876 5432 1098',
-			accountName: 'Jared Dunn',
+			accountName: 'Piped Piper Inc',
 			bankName: 'Silicon Valley Bank'
 		},
 		invoiceDetails: {
@@ -136,7 +136,7 @@
 </script>
 
 <div
-	class="max-w-screen-md mx-auto my-6 px-6 py-8 flex flex-col space-y-6 font-inter bg-white shadow-lg"
+	class="-rotate-2 max-w-screen-md mx-auto my-16 px-6 py-8 flex flex-col space-y-6 font-inter bg-white shadow-lg"
 >
 	<!-- Company & Invoice Row ------------------------------------------->
 	<div class="flex flex-row justify-between">
@@ -279,6 +279,64 @@
 
 	<!-- Bill Details Row ------------------------------------------------>
 
+	<form class="flex flex-row justif-between gap-2">
+		<button
+			disabled={itemDesc == ''}
+			on:click={() => {
+				addItem();
+			}}
+			class="rounded-l-lg p-2 bg-[#C9D990] absolute -ml-16 shadow"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="#1C471F"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				class="lucide lucide-plus"><path d="M5 12h14" /><path d="M12 5v14" /></svg
+			>
+		</button>
+
+		<input
+			id="descBox"
+			type="text"
+			bind:value={itemDesc}
+			placeholder="Item description"
+			class="border rounded-l p-2 grow"
+			on:keypress={(e) => {
+				e.key == 'Enter' && addItem();
+			}}
+		/>
+		<input
+			type="number"
+			bind:value={itemPrice}
+			placeholder="Unit Price"
+			min="1"
+			class="border rounded-l p-2 w-32"
+			on:keypress={(e) => {
+				e.key == 'Enter' && addItem();
+			}}
+		/>
+		<input
+			type="number"
+			bind:value={itemQty}
+			placeholder="Unit Price"
+			min="1"
+			step="1"
+			class="border rounded-l p-2 w-32"
+			on:keypress={(e) => {
+				e.key == 'Enter' && addItem();
+			}}
+		/>
+		<p class="border rounded-l p-2 w-32">
+			{itemTotal}
+		</p>
+	</form>
+
 	<table class="table-auto realtive">
 		<thead class="text-base bg-[#1E6F5C] text-white">
 			<tr>
@@ -294,7 +352,7 @@
 					on:click={() => {
 						deleteItem(index);
 					}}
-					class="rounded-l-lg p-2 bg-[#FFBE98] absolute -ml-16"
+					class="rounded-l-lg p-2 bg-[#F9A474] absolute -ml-16 mt-2 shadow"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -306,10 +364,7 @@
 						stroke-width="2"
 						stroke-linecap="round"
 						stroke-linejoin="round"
-						class="cursor-pointer lucide lucide-trash-2"
-						><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path
-							d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"
-						/><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg
+						class="cursor-pointer lucide lucide-minus"><path d="M5 12h14" /></svg
 					>
 				</button>
 				<tr class="my-2">
@@ -365,43 +420,6 @@
 			</tr>
 		</tfoot>
 	</table>
-
-	<form class="flex flex-row justif-between gap-2">
-		<input
-			id="descBox"
-			type="text"
-			bind:value={itemDesc}
-			placeholder="Item description"
-			class="border rounded-l p-2 grow"
-			on:keypress={(e) => {
-				e.key == 'Enter' && addItem();
-			}}
-		/>
-		<input
-			type="number"
-			bind:value={itemPrice}
-			placeholder="Unit Price"
-			min="1"
-			class="border rounded-l p-2 w-32"
-			on:keypress={(e) => {
-				e.key == 'Enter' && addItem();
-			}}
-		/>
-		<input
-			type="number"
-			bind:value={itemQty}
-			placeholder="Unit Price"
-			min="1"
-			step="1"
-			class="border rounded-l p-2 w-32"
-			on:keypress={(e) => {
-				e.key == 'Enter' && addItem();
-			}}
-		/>
-		<p class="border rounded-l p-2 w-32">
-			{itemTotal}
-		</p>
-	</form>
 
 	<div class="flex flex-row justify-between">
 		<span
