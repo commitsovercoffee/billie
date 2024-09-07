@@ -132,7 +132,7 @@
 		selectedImage = null;
 	}
 
-	const tableItemStyle = 'm-2 border p-2 break-words text-pretty';
+	const tableItemStyle = 'border px-2 py-4 break-words text-pretty';
 </script>
 
 <div
@@ -279,7 +279,7 @@
 
 	<!-- Bill Details Row ------------------------------------------------>
 
-	<table class="table-auto">
+	<table class="table-auto realtive">
 		<thead class="text-base bg-[#1E6F5C] text-white">
 			<tr>
 				<th>Item Description</th>
@@ -290,7 +290,29 @@
 		</thead>
 		<tbody>
 			{#each invoiceItems as item, index}
-				<tr>
+				<button
+					on:click={() => {
+						deleteItem(index);
+					}}
+					class="rounded-l-lg p-2 bg-[#FFBE98] absolute -ml-16"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="24"
+						height="24"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="#5B2715"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						class="cursor-pointer lucide lucide-trash-2"
+						><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path
+							d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"
+						/><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg
+					>
+				</button>
+				<tr class="my-2">
 					<td
 						on:keydown={(e) => {
 							e.key == 'Delete' && deleteItem(index);
@@ -298,12 +320,13 @@
 						class={tableItemStyle}
 						contenteditable="true"
 						bind:innerText={item.description}
-					></td>
+					>
+					</td>
 					<td
 						on:keydown={(e) => {
 							e.key == 'Delete' && deleteItem(index);
 						}}
-						class={tableItemStyle}
+						class="{tableItemStyle} text-right"
 						contenteditable="true"
 						bind:innerText={item.unitPrice}
 					></td>
@@ -311,7 +334,7 @@
 						on:keydown={(e) => {
 							e.key == 'Delete' && deleteItem(index);
 						}}
-						class={tableItemStyle}
+						class="{tableItemStyle} text-center"
 						contenteditable="true"
 						bind:innerText={item.quantity}
 					></td>
@@ -319,12 +342,11 @@
 						on:keydown={(e) => {
 							e.key == 'Delete' && deleteItem(index);
 						}}
-						class={tableItemStyle}>{item.unitPrice * item.quantity}</td
+						class="{tableItemStyle} text-right">{item.unitPrice * item.quantity}</td
 					>
 				</tr>
 			{/each}
-		</tbody>
-		<tfoot>
+		</tbody><tfoot>
 			<tr>
 				<th class="{tableItemStyle} text-right" scope="row" colspan="3">Subtotal</th>
 				<td class="{tableItemStyle} text-right">{subTotal}</td>
