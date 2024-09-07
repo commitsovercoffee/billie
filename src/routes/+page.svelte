@@ -21,7 +21,7 @@
 		},
 		invoiceDetails: {
 			date: '2024-09-07',
-			tax: 0.075,
+			tax: 0.18,
 			note: "Please note: Due to a mishap with Russ's bottle being on delete, some files were accidentally removed."
 		}
 	};
@@ -63,10 +63,12 @@
 	let totalDue = 0;
 
 	onMount(() => {
+		subTotal = 0;
+		totalDue = 0;
 		for (let item of invoiceItems) {
 			subTotal += item.unitPrice * item.quantity;
 		}
-		totalDue += billedBy.invoiceDetails.tax * subTotal;
+		totalDue = subTotal + billedBy.invoiceDetails.tax * subTotal;
 	});
 
 	let itemDesc = '';
@@ -74,21 +76,37 @@
 	let itemQty = 1;
 	$: itemTotal = itemPrice * itemQty;
 
-	function addValues() {
-		if (itemDesc != '' && itemPrice > 0 && itemQty > 0) {
-			descriptions = [...descriptions, itemDesc];
-			prices = [...prices, itemPrice];
-			quantities = [...quantities, itemQty];
+	function updateCart() {
+		subTotal = invoiceItems.reduce((total, item) => {
+			return total + item.unitPrice * item.quantity;
+		}, 0);
+		totalDue = subTotal + billedBy.invoiceDetails.tax * subTotal;
+	}
 
-			subTotal = subTotal + itemPrice * itemQty;
-			subtotal = calculateSubtotal(invoiceItems);
+	function addItem() {
+		if (itemDesc != '' && itemPrice > 0 && itemQty > 0) {
+			invoiceItems = [
+				...invoiceItems,
+				{
+					description: itemDesc,
+					unitPrice: itemPrice,
+					quantity: itemQty
+				}
+			];
 
 			itemDesc = '';
 			itemPrice = 1;
 			itemQty = 1;
 
 			document.getElementById('descBox').focus();
+
+			updateCart();
 		}
+	}
+
+	function deleteItem(index) {
+		invoiceItems = invoiceItems.filter((_, i) => i !== index);
+		updateCart();
 	}
 
 	let selectedImage = null;
@@ -113,10 +131,12 @@
 	function clearImage() {
 		selectedImage = null;
 	}
+
+	const tableItemStyle = 'm-2 border p-2 break-words text-pretty';
 </script>
 
 <div
-	class="max-w-screen-md mx-auto my-6 px-6 py-8 flex flex-col space-y-6 font-inter text-xs bg-white shadow-lg"
+	class="max-w-screen-md mx-auto my-6 px-6 py-8 flex flex-col space-y-6 font-inter bg-white shadow-lg"
 >
 	<!-- Company & Invoice Row ------------------------------------------->
 	<div class="flex flex-row justify-between">
@@ -216,13 +236,20 @@
 					</button>
 				{/if}
 			</div>
-			<p class="font-bold text-2xl text-[#1E6F5C]">Company Name</p>
+			<p class="font-bold text-2xl text-[#1E6F5C]">{billedBy.company}</p>
 		</div>
 
 		<!-- Right Section -->
 		<div>
 			<h2 class="font-bold text-2xl text-[#1E6F5C]">INVOICE</h2>
-			<p contenteditable="true" bind:innerText={billedBy.invoiceDetails.date}></p>
+			<input
+				type="text"
+				placeholder="May 24, 2014"
+				contenteditable="true"
+				class="w-32"
+				maxlength="12"
+				bind:value={billedBy.invoiceDetails.date}
+			/>
 		</div>
 	</div>
 
@@ -252,12 +279,70 @@
 
 	<!-- Bill Details Row ------------------------------------------------>
 
-	<div class="flex flex-row justif-between gap-2 bg-[#1E6F5C] text-white">
-		<p class="p-2 grow">Item Description</p>
-		<p class="p-2 w-32">Unit Price</p>
-		<p class="p-2 w-32">Qty</p>
-		<p class="p-2 w-32">Total</p>
-	</div>
+	<table class="table-auto">
+		<thead class="text-base bg-[#1E6F5C] text-white">
+			<tr>
+				<th>Item Description</th>
+				<th>Unit Price</th>
+				<th>Qty</th>
+				<th>Total</th>
+			</tr>
+		</thead>
+		<tbody>
+			{#each invoiceItems as item, index}
+				<tr>
+					<td
+						on:keydown={(e) => {
+							e.key == 'Delete' && deleteItem(index);
+						}}
+						class={tableItemStyle}
+						contenteditable="true"
+						bind:innerText={item.description}
+					></td>
+					<td
+						on:keydown={(e) => {
+							e.key == 'Delete' && deleteItem(index);
+						}}
+						class={tableItemStyle}
+						contenteditable="true"
+						bind:innerText={item.unitPrice}
+					></td>
+					<td
+						on:keydown={(e) => {
+							e.key == 'Delete' && deleteItem(index);
+						}}
+						class={tableItemStyle}
+						contenteditable="true"
+						bind:innerText={item.quantity}
+					></td>
+					<td
+						on:keydown={(e) => {
+							e.key == 'Delete' && deleteItem(index);
+						}}
+						class={tableItemStyle}>{item.unitPrice * item.quantity}</td
+					>
+				</tr>
+			{/each}
+		</tbody>
+		<tfoot>
+			<tr>
+				<th class="{tableItemStyle} text-right" scope="row" colspan="3">Subtotal</th>
+				<td class="{tableItemStyle} text-right">{subTotal}</td>
+			</tr>
+			<tr>
+				<th class="{tableItemStyle} text-right" scope="row" colspan="3">Tax</th>
+				<td
+					class="{tableItemStyle} text-right"
+					contenteditable="true"
+					bind:innerText={billedBy.invoiceDetails.tax}
+				></td>
+			</tr>
+			<tr>
+				<th class="{tableItemStyle} text-right" scope="row" colspan="3">Total Due</th>
+				<td class="{tableItemStyle} text-right">{totalDue}</td>
+			</tr>
+		</tfoot>
+	</table>
 
 	<form class="flex flex-row justif-between gap-2">
 		<input
@@ -267,7 +352,7 @@
 			placeholder="Item description"
 			class="border rounded-l p-2 grow"
 			on:keypress={(e) => {
-				e.key == 'Enter' && addValues();
+				e.key == 'Enter' && addItem();
 			}}
 		/>
 		<input
@@ -277,7 +362,7 @@
 			min="1"
 			class="border rounded-l p-2 w-32"
 			on:keypress={(e) => {
-				e.key == 'Enter' && addValues();
+				e.key == 'Enter' && addItem();
 			}}
 		/>
 		<input
@@ -288,7 +373,7 @@
 			step="1"
 			class="border rounded-l p-2 w-32"
 			on:keypress={(e) => {
-				e.key == 'Enter' && addValues();
+				e.key == 'Enter' && addItem();
 			}}
 		/>
 		<p class="border rounded-l p-2 w-32">
@@ -296,78 +381,12 @@
 		</p>
 	</form>
 
-	<div class="flex flex-col gap-2">
-		{#each invoiceItems as _, index}
-			<div class="flex flex-row justify-between gap-2">
-				<input
-					type="text"
-					placeholder={invoiceItems[index].description}
-					bind:value={invoiceItems[index].description}
-					contenteditable="true"
-					class="border rounded-l p-2 grow"
-				/>
-				<input
-					type="number"
-					min="1"
-					placeholder={invoiceItems[index].unitPrice}
-					bind:value={invoiceItems[index].unitPrice}
-					contenteditable="true"
-					class="border rounded-l p-2"
-				/>
-				<input
-					type="number"
-					min="1"
-					step="1"
-					placeholder={invoiceItems[index].quantity}
-					bind:value={invoiceItems[index].quantity}
-					contenteditable="true"
-					class="border rounded-l p-2"
-				/>
-
-				<p disabled class="border rounded-l p-2">
-					{invoiceItems[index].unitPrice * invoiceItems[index].quantity}
-				</p>
-			</div>
-		{/each}
-	</div>
-
 	<div class="flex flex-row justify-between">
 		<span
 			class="p-2 w-60 h-auto break-words text-pretty shadow-inner border bg-gray-50"
 			contenteditable="true"
 			bind:innerText={billedBy.invoiceDetails.note}
 		></span>
-		<div class="flex flex-col gap-2">
-			<div class="flex flex-row gap-4 justify-end items-center">
-				<p>Subtotal</p>
-				<input
-					type="text"
-					disabled
-					bind:value={subTotal}
-					placeholder="Tax %"
-					class="border rounded-l p-2 w-32"
-				/>
-			</div>
-			<div class="flex flex-row gap-4 justify-end items-center">
-				<p>Tax</p>
-				<input
-					type="number"
-					bind:value={billedBy.invoiceDetails.tax}
-					placeholder="Tax %"
-					class="border rounded-l p-2 w-32"
-				/>
-			</div>
-			<div class="flex flex-row gap-4 justify-end items-center">
-				<p>Total Due</p>
-				<input
-					type="text"
-					disabled
-					bind:value={totalDue}
-					placeholder="Tax %"
-					class="border rounded-l p-2 w-32"
-				/>
-			</div>
-		</div>
 	</div>
 
 	<p>Thank you for your business</p>
@@ -390,7 +409,7 @@
 			</p>
 		</div>
 		<div>
-			<h4 class="font-bold my-4">Questions</h4>
+			<h4 class="font-bold my-4">Questions?</h4>
 			<p>Email : <span contenteditable="true" bind:innerText={billedBy.contact.email}></span></p>
 			<p>Phone : <span contenteditable="true" bind:innerText={billedBy.contact.phone}></span></p>
 		</div>
