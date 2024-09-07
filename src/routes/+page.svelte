@@ -1,4 +1,6 @@
 <script>
+	let date = 'January 1, 2050';
+
 	let mail = 'abc@gmail.com';
 	let phone = '+91 9876543210';
 
@@ -61,14 +63,18 @@
 	}
 </script>
 
-<div class="prose prose-sm max-w-screen-md mx-auto my-6 px-6 py-8 shadow flex flex-col space-y-8">
+<div
+	class="max-w-screen-md mx-auto my-6 px-6 py-8 flex flex-col space-y-6 font-inter bg-white shadow-lg"
+>
+	<!-- Company & Invoice Row ------------------------------------------->
 	<div class="flex flex-row justify-between">
-		<div>
+		<!-- Left Section --->
+		<div class="flex flex-col gap-4">
 			<div>
-				<!-- Display Image -->
+				<!-- Company Logo -->
 				{#if selectedImage}
-					<div class="flex flex-row justify-between items-center">
-						<div class="flex flex-col rounded-xl shadow-md">
+					<div class="flex flex-row items-center space-x-4">
+						<div class="flex flex-col border rounded-xl shadow-md">
 							<button on:click={clearImage}>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -111,13 +117,21 @@
 										r="2"
 									/></svg
 								>
+								<input
+									id="imageInput"
+									type="file"
+									accept=".png,.jpg,.jpeg,.webp"
+									on:change={handleImageChange}
+									class="hidden"
+								/>
 							</button>
 						</div>
-						<img src={selectedImage} alt="Company Logo" class="h-24 w-auto object-fill m-0" />
+						<img src={selectedImage} alt="Company Logo" class="h-auto w-64 object-fill m-0" />
 					</div>
 				{:else}
+					<!-- Image Picker -->
 					<button
-						class="flex flex-row space-x-2 items-center border border-dashed border-gray-400 px-4 py-1 rounded-lg cursor-pointer hover:bg-gray-50 transition duration-150 ease-in-out"
+						class="p-2 flex flex-row gap-2 rounded-lg shadow-md border cursor-pointer"
 						on:click={() => document.getElementById('imageInput').click()}
 					>
 						<svg
@@ -139,23 +153,24 @@
 								r="2"
 							/></svg
 						>
-
-						<p class="text-center text-gray-600">Click to select an image</p>
+						<p>Click to select an image for logo</p>
+						<input
+							id="imageInput"
+							type="file"
+							accept=".png,.jpg,.jpeg,.webp"
+							on:change={handleImageChange}
+							class="hidden"
+						/>
 					</button>
-					<input
-						id="imageInput"
-						type="file"
-						accept=".png,.jpg,.jpeg,.webp"
-						on:change={handleImageChange}
-						class="hidden"
-					/>
 				{/if}
 			</div>
 			<p class="font-bold text-2xl">Company Name</p>
 		</div>
-		<div>
+
+		<!-- Right Section -------------------------------------------->
+		<div class="flex flex-col justify-between">
 			<h2 class="font-bold text-2xl">INVOICE</h2>
-			<p>December 26, 2024</p>
+			<p contenteditable="true" bind:innerText={date}></p>
 		</div>
 	</div>
 	<div class="flex flex-row justify-between">
