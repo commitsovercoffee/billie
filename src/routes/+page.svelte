@@ -1,27 +1,78 @@
 <script>
-	let date = 'January 1, 2050';
+	import { onMount } from 'svelte';
 
-	let mail = 'abc@gmail.com';
-	let phone = '+91 9876543210';
+	let billedBy = {
+		company: 'Piper Piper',
+		address: {
+			apartment: 'Apartment 3B',
+			street: '555 Silicon Street',
+			city: 'Palo Alto',
+			state: 'California',
+			pincode: '94301'
+		},
+		contact: {
+			phone: '+1 650-555-1234',
+			email: 'jared.dunn@piedpiper.com'
+		},
+		bankDetails: {
+			accountNumber: '9876 5432 1098',
+			accountName: 'Jared Dunn',
+			bankName: 'Silicon Valley Bank'
+		},
+		invoiceDetails: {
+			date: '2024-09-07',
+			tax: 0.075,
+			note: "Please note: Due to a mishap with Russ's bottle being on delete, some files were accidentally removed."
+		}
+	};
 
-	let account = '1234 567 890';
-	let accountName = 'Jared Dunn';
-	let bankName = 'Silicon Vallery Bank';
+	let billedTo = {
+		company: 'Intersite',
+		address: {
+			apartment: 'Suite 69',
+			street: 'Adult Entertainment',
+			city: 'Los Angeles',
+			state: 'California',
+			pincode: '90028'
+		},
+		contact: {
+			phone: '+1 213-555-6969',
+			email: 'billing@intersite.com'
+		}
+	};
+
+	let invoiceItems = [
+		{
+			description: 'Data Compression Service Subscription',
+			unitPrice: 500, // Price in USD or relevant currency
+			quantity: 1
+		},
+		{
+			description: 'Cloud Storage (100GB)',
+			unitPrice: 100,
+			quantity: 5 // 5 units of 100GB storage
+		},
+		{
+			description: 'Video Encoding & Streaming Optimization',
+			unitPrice: 300,
+			quantity: 3 // 3 video projects optimized
+		}
+	];
+
+	let subTotal = 0;
+	let totalDue = 0;
+
+	onMount(() => {
+		for (let item of invoiceItems) {
+			subTotal += item.unitPrice * item.quantity;
+		}
+		totalDue += billedBy.invoiceDetails.tax * subTotal;
+	});
 
 	let itemDesc = '';
 	let itemPrice = 1;
 	let itemQty = 1;
 	$: itemTotal = itemPrice * itemQty;
-
-	let descriptions = [];
-	let prices = [];
-	let quantities = [];
-
-	let subTotal = 0;
-	let tax = 0.18;
-	$: totalDue = subTotal + tax * subTotal;
-
-	let note = 'Add comments here.';
 
 	function addValues() {
 		if (itemDesc != '' && itemPrice > 0 && itemQty > 0) {
@@ -30,6 +81,7 @@
 			quantities = [...quantities, itemQty];
 
 			subTotal = subTotal + itemPrice * itemQty;
+			subtotal = calculateSubtotal(invoiceItems);
 
 			itemDesc = '';
 			itemPrice = 1;
@@ -64,7 +116,7 @@
 </script>
 
 <div
-	class="max-w-screen-md mx-auto my-6 px-6 py-8 flex flex-col space-y-6 font-inter bg-white shadow-lg"
+	class="max-w-screen-md mx-auto my-6 px-6 py-8 flex flex-col space-y-6 font-inter text-xs bg-white shadow-lg"
 >
 	<!-- Company & Invoice Row ------------------------------------------->
 	<div class="flex flex-row justify-between">
@@ -126,7 +178,7 @@
 								/>
 							</button>
 						</div>
-						<img src={selectedImage} alt="Company Logo" class="h-auto w-64 object-fill m-0" />
+						<img src={selectedImage} alt="Company Logo" class="max-h-32 w-auto object-cover m-0" />
 					</div>
 				{:else}
 					<!-- Image Picker -->
@@ -164,37 +216,46 @@
 					</button>
 				{/if}
 			</div>
-			<p class="font-bold text-2xl">Company Name</p>
+			<p class="font-bold text-2xl text-[#1E6F5C]">Company Name</p>
 		</div>
 
-		<!-- Right Section -------------------------------------------->
-		<div class="flex flex-col justify-between">
-			<h2 class="font-bold text-2xl">INVOICE</h2>
-			<p contenteditable="true" bind:innerText={date}></p>
+		<!-- Right Section -->
+		<div>
+			<h2 class="font-bold text-2xl text-[#1E6F5C]">INVOICE</h2>
+			<p contenteditable="true" bind:innerText={billedBy.invoiceDetails.date}></p>
 		</div>
 	</div>
+
+	<hr />
+
+	<!-- Address Row ----------------------------------------------------->
 	<div class="flex flex-row justify-between">
 		<div>
-			<p class="font-bold">Address</p>
-			<p>Apartment, Suite, Unit etc</p>
-			<p>Street Name</p>
-			<p>City, State</p>
-			<p>Pincode</p>
-			<p>+91 9876543210</p>
+			<p class="font-bold">Address :</p>
+			<p contenteditable="true" bind:innerText={billedBy.company}></p>
+			<p contenteditable="true" bind:innerText={billedBy.address.apartment}></p>
+			<p contenteditable="true" bind:innerText={billedBy.address.street}></p>
+			<p contenteditable="true" bind:innerText={billedBy.address.city}></p>
+			<p contenteditable="true" bind:innerText={billedBy.address.state}></p>
+			<p contenteditable="true" bind:innerText={billedBy.address.pincode}></p>
 		</div>
 		<div>
-			<p class="font-bold">To</p>
-			<p>Apartment, Suite, Unit etc</p>
-			<p>Street Name</p>
-			<p>City, State</p>
-			<p>Pincode</p>
+			<p class="font-bold">To :</p>
+			<p contenteditable="true" bind:innerText={billedTo.company}></p>
+			<p contenteditable="true" bind:innerText={billedTo.address.apartment}></p>
+			<p contenteditable="true" bind:innerText={billedTo.address.street}></p>
+			<p contenteditable="true" bind:innerText={billedTo.address.city}></p>
+			<p contenteditable="true" bind:innerText={billedTo.address.state}></p>
+			<p contenteditable="true" bind:innerText={billedTo.address.pincode}></p>
 		</div>
 	</div>
 
-	<div class="flex flex-row justif-between gap-2">
+	<!-- Bill Details Row ------------------------------------------------>
+
+	<div class="flex flex-row justif-between gap-2 bg-[#1E6F5C] text-white">
 		<p class="p-2 grow">Item Description</p>
 		<p class="p-2 w-32">Unit Price</p>
-		<p class="p-2 w-32">Qnt</p>
+		<p class="p-2 w-32">Qty</p>
 		<p class="p-2 w-32">Total</p>
 	</div>
 
@@ -236,35 +297,35 @@
 	</form>
 
 	<div class="flex flex-col gap-2">
-		{#each descriptions as _, index}
+		{#each invoiceItems as _, index}
 			<div class="flex flex-row justify-between gap-2">
 				<input
 					type="text"
-					placeholder={descriptions[index]}
-					bind:value={descriptions[index]}
+					placeholder={invoiceItems[index].description}
+					bind:value={invoiceItems[index].description}
 					contenteditable="true"
 					class="border rounded-l p-2 grow"
 				/>
 				<input
 					type="number"
 					min="1"
-					placeholder={prices[index]}
-					bind:value={prices[index]}
+					placeholder={invoiceItems[index].unitPrice}
+					bind:value={invoiceItems[index].unitPrice}
 					contenteditable="true"
-					class="border rounded-l p-2 w-32"
+					class="border rounded-l p-2"
 				/>
 				<input
 					type="number"
 					min="1"
 					step="1"
-					placeholder={quantities[index]}
-					bind:value={quantities[index]}
+					placeholder={invoiceItems[index].quantity}
+					bind:value={invoiceItems[index].quantity}
 					contenteditable="true"
-					class="border rounded-l p-2 w-32"
+					class="border rounded-l p-2"
 				/>
 
-				<p contenteditable="true" class="border rounded-l p-2 w-32">
-					{prices[index] * quantities[index]}
+				<p disabled class="border rounded-l p-2">
+					{invoiceItems[index].unitPrice * invoiceItems[index].quantity}
 				</p>
 			</div>
 		{/each}
@@ -272,9 +333,9 @@
 
 	<div class="flex flex-row justify-between">
 		<span
-			class="p-2 w-60 h-auto break-words text-pretty shadow-inner"
+			class="p-2 w-60 h-auto break-words text-pretty shadow-inner border bg-gray-50"
 			contenteditable="true"
-			bind:innerText={note}
+			bind:innerText={billedBy.invoiceDetails.note}
 		></span>
 		<div class="flex flex-col gap-2">
 			<div class="flex flex-row gap-4 justify-end items-center">
@@ -291,7 +352,7 @@
 				<p>Tax</p>
 				<input
 					type="number"
-					bind:value={tax}
+					bind:value={billedBy.invoiceDetails.tax}
 					placeholder="Tax %"
 					class="border rounded-l p-2 w-32"
 				/>
@@ -315,15 +376,23 @@
 
 	<div class="flex flex-row justify-between">
 		<div>
-			<h4 class="font-bold my-4">Questions</h4>
-			<p>Email : <span contenteditable="true" bind:innerText={mail}></span></p>
-			<p>Phone : <span contenteditable="true" bind:innerText={phone}></span></p>
+			<h4 class="font-bold my-4">Payment Info</h4>
+			<p>
+				Account : <span contenteditable="true" bind:innerText={billedBy.bankDetails.accountNumber}
+				></span>
+			</p>
+			<p>
+				A/C Name : <span contenteditable="true" bind:innerText={billedBy.bankDetails.accountName}
+				></span>
+			</p>
+			<p>
+				Bank : <span contenteditable="true" bind:innerText={billedBy.bankDetails.bankName}></span>
+			</p>
 		</div>
 		<div>
-			<h4 class="font-bold my-4">Payment Info</h4>
-			<p>Account : <span contenteditable="true" bind:innerText={account}></span></p>
-			<p>A/C Name : <span contenteditable="true" bind:innerText={accountName}></span></p>
-			<p>Bank : <span contenteditable="true" bind:innerText={bankName}></span></p>
+			<h4 class="font-bold my-4">Questions</h4>
+			<p>Email : <span contenteditable="true" bind:innerText={billedBy.contact.email}></span></p>
+			<p>Phone : <span contenteditable="true" bind:innerText={billedBy.contact.phone}></span></p>
 		</div>
 	</div>
 </div>
