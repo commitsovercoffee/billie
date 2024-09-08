@@ -273,7 +273,7 @@
 				{:else}
 					<!-- Image Picker -->
 					<button
-						class="p-2 flex flex-row gap-2 rounded-lg shadow-md border cursor-pointer"
+						class="print:hidden p-2 flex flex-row gap-2 rounded-lg shadow-md border cursor-pointer"
 						on:click={() => document.getElementById('imageInput').click()}
 					>
 						<svg
@@ -322,12 +322,12 @@
 					bind:innerText={invoiceData.billedBy.invoiceDetails.number}
 				></span>
 			</h2>
-			<div class="flex flex-col space-y-2 absolute -right-16">
+			<div class="flex flex-col space-y-2 absolute -right-20">
 				<button
 					on:click={() => {
 						resetInvoiceData();
 					}}
-					class="print:hidden rounded-r-lg p-2 bg-[#C3B2E7] shadow cursor-pointer"
+					class="print:hidden rounded-lg p-2 bg-white shadow cursor-pointer active:scale-90 transition-all duration-100 ease-in"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -335,8 +335,8 @@
 						height="24"
 						viewBox="0 0 24 24"
 						fill="none"
-						stroke="#52225E"
-						stroke-width="2"
+						stroke="#295F98"
+						stroke-width="1.5"
 						stroke-linecap="round"
 						stroke-linejoin="round"
 						class="lucide lucide-rotate-ccw"
@@ -349,7 +349,7 @@
 					on:click={() => {
 						window.print();
 					}}
-					class="print:hidden rounded-r-lg p-2 bg-[#F682A5] shadow cursor-pointer"
+					class="print:hidden rounded-lg p-2 bg-white shadow cursor-pointer active:scale-90 transition-all duration-100 ease-in"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -357,8 +357,8 @@
 						height="24"
 						viewBox="0 0 24 24"
 						fill="none"
-						stroke="#52225E"
-						stroke-width="2"
+						stroke="#424242"
+						stroke-width="1.5"
 						stroke-linecap="round"
 						stroke-linejoin="round"
 						class="lucide lucide-printer"
@@ -469,11 +469,11 @@
 
 	<form class="print:hidden flex flex-row justif-between gap-2">
 		<button
-			disabled={itemDesc == ''}
+			disabled={itemDesc == '' && false}
 			on:click={() => {
 				addItem();
 			}}
-			class=" rounded-l-lg p-2 bg-[#C9D990] absolute -ml-16 shadow"
+			class="absolute -ml-20 print:hidden rounded-full p-2 bg-white shadow cursor-pointer active:scale-90 transition-all duration-100 ease-in"
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -481,8 +481,8 @@
 				height="24"
 				viewBox="0 0 24 24"
 				fill="none"
-				stroke="#1C471F"
-				stroke-width="2"
+				stroke="#557571"
+				stroke-width="1.8"
 				stroke-linecap="round"
 				stroke-linejoin="round"
 				class="lucide lucide-plus"><path d="M5 12h14" /><path d="M12 5v14" /></svg
@@ -540,7 +540,7 @@
 					on:click={() => {
 						deleteItem(index);
 					}}
-					class="print:hidden rounded-l-lg p-2 bg-[#F9A474] absolute -ml-16 mt-2 shadow"
+					class="absolute -ml-20 print:hidden rounded-full p-2 bg-white shadow cursor-pointer active:scale-90 transition-all duration-100 ease-in"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -548,14 +548,17 @@
 						height="24"
 						viewBox="0 0 24 24"
 						fill="none"
-						stroke="#5B2715"
-						stroke-width="2"
+						stroke="#C96868"
+						stroke-width="1.8"
 						stroke-linecap="round"
 						stroke-linejoin="round"
-						class="cursor-pointer lucide lucide-minus"><path d="M5 12h14" /></svg
+						class="lucide lucide-trash-2"
+						><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path
+							d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"
+						/><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg
 					>
 				</button>
-				<tr class="my-2 {index % 2 != 0 && 'bg-gray-50'}">
+				<tr class="my-2 {index % 2 != 0 && 'bg-gray-100'}">
 					<td
 						on:keydown={(e) => {
 							e.key == 'Delete' && deleteItem(index);
