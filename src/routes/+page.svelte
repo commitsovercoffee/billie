@@ -4,63 +4,116 @@
 	// Default invoiceData object
 	let invoiceData = {
 		billedBy: {
-			company: 'Piper Piper',
+			company: '',
 			address: {
-				apartment: 'Apartment 3B',
-				street: '555 Silicon Street',
-				city: 'Palo Alto',
-				state: 'California',
-				pincode: '94301'
+				apartment: '',
+				street: '',
+				city: '',
+				state: '',
+				pincode: ''
 			},
 			contact: {
-				phone: '+1 650-555-1234',
-				email: 'jared.dunn@piedpiper.com'
+				phone: '',
+				email: ''
 			},
 			bankDetails: {
-				accountNumber: '9876 5432 1098',
-				accountName: 'Piped Piper Inc',
-				bankName: 'Silicon Valley Bank'
+				accountNumber: '',
+				accountName: '',
+				bankName: ''
 			},
 			invoiceDetails: {
-				date: '2024-09-07',
-				tax: 0.18,
-				note: "Please note: Due to a mishap with Russ's bottle being on delete, some files were accidentally removed."
+				date: '',
+				tax: null,
+				note: ''
 			}
 		},
 		billedTo: {
-			company: 'Intersite',
+			company: '',
 			address: {
-				apartment: 'Suite 69',
-				street: 'Adult Entertainment',
-				city: 'Los Angeles',
-				state: 'California',
-				pincode: '90028'
+				apartment: '',
+				street: '',
+				city: '',
+				state: '',
+				pincode: ''
 			},
 			contact: {
-				phone: '+1 213-555-6969',
-				email: 'billing@intersite.com'
+				phone: '',
+				email: ''
 			}
 		},
 		invoiceItems: [
 			{
-				description: 'Data Compression Service Subscription',
-				unitPrice: 500,
-				quantity: 1
-			},
-			{
-				description: 'Cloud Storage (100GB)',
-				unitPrice: 100,
-				quantity: 5
-			},
-			{
-				description: 'Video Encoding & Streaming Optimization',
-				unitPrice: 300,
-				quantity: 3
+				description: '',
+				unitPrice: null,
+				quantity: null
 			}
 		]
 	};
-
 	let selectedImage = null;
+
+	function resetInvoiceData() {
+		console.log(invoiceData);
+		invoiceData = {
+			billedBy: {
+				company: 'Piper Piper',
+				address: {
+					apartment: 'Apartment 3B',
+					street: '555 Silicon Street',
+					city: 'Palo Alto',
+					state: 'California',
+					pincode: '94301'
+				},
+				contact: {
+					phone: '+1 650-555-1234',
+					email: 'jared.dunn@piedpiper.com'
+				},
+				bankDetails: {
+					accountNumber: '9876 5432 1098',
+					accountName: 'Piped Piper Inc',
+					bankName: 'Silicon Valley Bank'
+				},
+				invoiceDetails: {
+					date: '2024-09-07',
+					tax: 0.18,
+					note: "Please note: Due to a mishap with Russ's bottle being on delete, some files were accidentally removed."
+				}
+			},
+			billedTo: {
+				company: 'Intersite',
+				address: {
+					apartment: 'Suite 69',
+					street: 'Adult Entertainment',
+					city: 'Los Angeles',
+					state: 'California',
+					pincode: '90028'
+				},
+				contact: {
+					phone: '+1 213-555-6969',
+					email: 'billing@intersite.com'
+				}
+			},
+			invoiceItems: [
+				{
+					description: 'Data Compression Service Subscription',
+					unitPrice: 500,
+					quantity: 1
+				},
+				{
+					description: 'Cloud Storage (100GB)',
+					unitPrice: 100,
+					quantity: 5
+				},
+				{
+					description: 'Video Encoding & Streaming Optimization',
+					unitPrice: 300,
+					quantity: 3
+				}
+			]
+		};
+
+		selectedImage = null;
+		updateLocalStorage();
+	}
 
 	// Function to update local storage whenever invoiceData changes
 	function updateLocalStorage() {
@@ -75,6 +128,8 @@
 		const savedData = localStorage.getItem('invoiceData');
 		if (savedData) {
 			invoiceData = JSON.parse(savedData); // Parse saved data
+		} else {
+			resetInvoiceData();
 		}
 
 		const savedImage = localStorage.getItem('selectedImage');
@@ -147,7 +202,7 @@
 <svelte:body on:click={() => updateLocalStorage()} />
 
 <div
-	class="-rotate-2 max-w-screen-md mx-auto my-16 px-6 py-8 flex flex-col space-y-6 font-inter bg-white shadow-lg"
+	class="print:rotate-0 print:m-0 -rotate-2 max-w-screen-md mx-auto my-16 px-6 py-8 flex flex-col space-y-6 font-inter bg-white print:shadow-none shadow-lg"
 >
 	<!-- Company & Invoice Row ------------------------------------------->
 	<div class="flex flex-row justify-between">
@@ -156,8 +211,8 @@
 			<div>
 				<!-- Company Logo -->
 				{#if selectedImage}
-					<div class="flex flex-row items-center space-x-4">
-						<div class="flex flex-col border rounded-xl shadow-md">
+					<div class="flex flex-row items-center print:space-x-0 space-x-4">
+						<div class="print:hidden flex flex-col border rounded-xl shadow-md">
 							<button on:click={clearImage}>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -209,7 +264,7 @@
 								/>
 							</button>
 						</div>
-						<img src={selectedImage} alt="Company Logo" class="max-h-32 w-auto object-cover m-0" />
+						<img src={selectedImage} alt="Company Logo" class="max-h-18 w-auto object-cover m-0" />
 					</div>
 				{:else}
 					<!-- Image Picker -->
@@ -256,8 +311,61 @@
 		</div>
 
 		<!-- Right Section -->
-		<div>
+		<div class="relative">
 			<h2 class="font-bold text-2xl text-[#1E6F5C]">INVOICE</h2>
+			<div class="flex flex-col space-y-2 absolute -right-16">
+				<button
+					on:click={() => {
+						resetInvoiceData();
+					}}
+					class="print:hidden rounded-r-lg p-2 bg-[#C3B2E7] shadow cursor-pointer"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="24"
+						height="24"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="#52225E"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						class="lucide lucide-rotate-ccw"
+						><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path
+							d="M3 3v5h5"
+						/></svg
+					>
+				</button>
+				<button
+					on:click={() => {
+						window.print();
+					}}
+					class="print:hidden rounded-r-lg p-2 bg-[#F682A5] shadow cursor-pointer"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="24"
+						height="24"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="#52225E"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						class="lucide lucide-printer"
+						><path
+							d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
+						/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6" /><rect
+							x="6"
+							y="14"
+							width="12"
+							height="8"
+							rx="1"
+						/></svg
+					>
+				</button>
+			</div>
+
 			<input
 				type="text"
 				placeholder="May 24, 2014"
@@ -344,13 +452,13 @@
 
 	<!-- Bill Details Row ------------------------------------------------>
 
-	<form class="flex flex-row justif-between gap-2">
+	<form class="print:hidden flex flex-row justif-between gap-2">
 		<button
 			disabled={itemDesc == ''}
 			on:click={() => {
 				addItem();
 			}}
-			class="rounded-l-lg p-2 bg-[#C9D990] absolute -ml-16 shadow"
+			class=" rounded-l-lg p-2 bg-[#C9D990] absolute -ml-16 shadow"
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -417,7 +525,7 @@
 					on:click={() => {
 						deleteItem(index);
 					}}
-					class="rounded-l-lg p-2 bg-[#F9A474] absolute -ml-16 mt-2 shadow"
+					class="print:hidden rounded-l-lg p-2 bg-[#F9A474] absolute -ml-16 mt-2 shadow"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -476,7 +584,7 @@
 				<td
 					class="{tableItemStyle} text-right"
 					contenteditable="true"
-					on:input={() => updateCart()}
+					on:input={() => updateLocalStorage()}
 					bind:innerText={invoiceData.billedBy.invoiceDetails.tax}
 				></td>
 			</tr>

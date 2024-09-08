@@ -8,7 +8,7 @@
 </script>
 
 <slot />
-<footer>
+<footer class="print:hidden">
 	<p id="credits" class="p-2 m-2 my-12 text-center align-middle text-stone-800">
 		© 2024
 		<a class={creditStyle} href="https://github.com/commitsovercoffee/bill-me">bill-me</a>
