@@ -22,7 +22,9 @@
 				bankName: ''
 			},
 			invoiceDetails: {
-				date: '',
+				number: null,
+				created: '',
+				due: '',
 				tax: null,
 				note: ''
 			}
@@ -73,7 +75,9 @@
 					bankName: 'Silicon Valley Bank'
 				},
 				invoiceDetails: {
-					date: '2024-09-07',
+					number: 2,
+					created: 'May 24, 2014',
+					due: 'May 24, 2014',
 					tax: 0.18,
 					note: "Please note: Due to a mishap with Russ's bottle being on delete, some files were accidentally removed."
 				}
@@ -202,7 +206,7 @@
 <svelte:body on:click={() => updateLocalStorage()} />
 
 <div
-	class="print:rotate-0 print:m-0 -rotate-2 max-w-screen-md mx-auto my-16 px-6 py-8 flex flex-col space-y-6 font-inter bg-white print:shadow-none shadow-lg"
+	class="print:rotate-0 print:m-0 -rotate-1 max-w-screen-md mx-auto my-16 px-6 py-8 flex flex-col space-y-6 font-inter bg-white print:shadow-none shadow-lg"
 >
 	<!-- Company & Invoice Row ------------------------------------------->
 	<div class="flex flex-row justify-between">
@@ -303,7 +307,7 @@
 				{/if}
 			</div>
 			<input
-				class="font-bold text-2xl text-[#1E6F5C]"
+				class="font-bold text-2xl"
 				type="text"
 				bind:value={invoiceData.billedBy.company}
 				on:input={() => updateLocalStorage()}
@@ -311,8 +315,13 @@
 		</div>
 
 		<!-- Right Section -->
-		<div class="relative">
-			<h2 class="font-bold text-2xl text-[#1E6F5C]">INVOICE</h2>
+		<div class="relative flex flex-col items-end gap-1">
+			<h2 class="font-bold text-2xl text-[#1E6F5C] text-right">
+				INVOICE #<span
+					contenteditable="true"
+					bind:innerText={invoiceData.billedBy.invoiceDetails.number}
+				></span>
+			</h2>
 			<div class="flex flex-col space-y-2 absolute -right-16">
 				<button
 					on:click={() => {
@@ -365,16 +374,22 @@
 					>
 				</button>
 			</div>
-
-			<input
-				type="text"
-				placeholder="May 24, 2014"
-				contenteditable="true"
-				class="w-32"
-				maxlength="12"
-				on:input={() => updateLocalStorage()}
-				bind:value={invoiceData.billedBy.invoiceDetails.date}
-			/>
+			<p>
+				Created :
+				<span
+					contenteditable="true"
+					on:input={() => updateLocalStorage()}
+					bind:innerText={invoiceData.billedBy.invoiceDetails.created}
+				></span>
+			</p>
+			<p>
+				Due :
+				<span
+					contenteditable="true"
+					on:input={() => updateLocalStorage()}
+					bind:innerText={invoiceData.billedBy.invoiceDetails.due}
+				></span>
+			</p>
 		</div>
 	</div>
 
@@ -511,12 +526,12 @@
 	</form>
 
 	<table class="table-auto realtive">
-		<thead class="text-base bg-[#1E6F5C] text-white">
-			<tr>
-				<th>Item Description</th>
-				<th>Unit Price</th>
-				<th>Qty</th>
-				<th>Total</th>
+		<thead>
+			<tr class="bg-[#1E6F5C] text-white">
+				<th class={tableItemStyle}>Item Description</th>
+				<th class={tableItemStyle}>Unit Price</th>
+				<th class={tableItemStyle}>Qty</th>
+				<th class={tableItemStyle}>Total</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -540,7 +555,7 @@
 						class="cursor-pointer lucide lucide-minus"><path d="M5 12h14" /></svg
 					>
 				</button>
-				<tr class="my-2">
+				<tr class="my-2 {index % 2 != 0 && 'bg-gray-50'}">
 					<td
 						on:keydown={(e) => {
 							e.key == 'Delete' && deleteItem(index);
