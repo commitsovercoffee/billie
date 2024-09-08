@@ -1,74 +1,86 @@
 <script>
 	import { onMount } from 'svelte';
 
-	let billedBy = {
-		company: 'Piper Piper',
-		address: {
-			apartment: 'Apartment 3B',
-			street: '555 Silicon Street',
-			city: 'Palo Alto',
-			state: 'California',
-			pincode: '94301'
+	// Default invoiceData object
+	let invoiceData = {
+		billedBy: {
+			company: 'Piper Piper',
+			address: {
+				apartment: 'Apartment 3B',
+				street: '555 Silicon Street',
+				city: 'Palo Alto',
+				state: 'California',
+				pincode: '94301'
+			},
+			contact: {
+				phone: '+1 650-555-1234',
+				email: 'jared.dunn@piedpiper.com'
+			},
+			bankDetails: {
+				accountNumber: '9876 5432 1098',
+				accountName: 'Piped Piper Inc',
+				bankName: 'Silicon Valley Bank'
+			},
+			invoiceDetails: {
+				date: '2024-09-07',
+				tax: 0.18,
+				note: "Please note: Due to a mishap with Russ's bottle being on delete, some files were accidentally removed."
+			}
 		},
-		contact: {
-			phone: '+1 650-555-1234',
-			email: 'jared.dunn@piedpiper.com'
+		billedTo: {
+			company: 'Intersite',
+			address: {
+				apartment: 'Suite 69',
+				street: 'Adult Entertainment',
+				city: 'Los Angeles',
+				state: 'California',
+				pincode: '90028'
+			},
+			contact: {
+				phone: '+1 213-555-6969',
+				email: 'billing@intersite.com'
+			}
 		},
-		bankDetails: {
-			accountNumber: '9876 5432 1098',
-			accountName: 'Piped Piper Inc',
-			bankName: 'Silicon Valley Bank'
-		},
-		invoiceDetails: {
-			date: '2024-09-07',
-			tax: 0.18,
-			note: "Please note: Due to a mishap with Russ's bottle being on delete, some files were accidentally removed."
-		}
+		invoiceItems: [
+			{
+				description: 'Data Compression Service Subscription',
+				unitPrice: 500,
+				quantity: 1
+			},
+			{
+				description: 'Cloud Storage (100GB)',
+				unitPrice: 100,
+				quantity: 5
+			},
+			{
+				description: 'Video Encoding & Streaming Optimization',
+				unitPrice: 300,
+				quantity: 3
+			}
+		]
 	};
 
-	let billedTo = {
-		company: 'Intersite',
-		address: {
-			apartment: 'Suite 69',
-			street: 'Adult Entertainment',
-			city: 'Los Angeles',
-			state: 'California',
-			pincode: '90028'
-		},
-		contact: {
-			phone: '+1 213-555-6969',
-			email: 'billing@intersite.com'
-		}
-	};
+	let selectedImage = null;
 
-	let invoiceItems = [
-		{
-			description: 'Data Compression Service Subscription',
-			unitPrice: 500, // Price in USD or relevant currency
-			quantity: 1
-		},
-		{
-			description: 'Cloud Storage (100GB)',
-			unitPrice: 100,
-			quantity: 5 // 5 units of 100GB storage
-		},
-		{
-			description: 'Video Encoding & Streaming Optimization',
-			unitPrice: 300,
-			quantity: 3 // 3 video projects optimized
+	// Function to update local storage whenever invoiceData changes
+	function updateLocalStorage() {
+		localStorage.setItem('invoiceData', JSON.stringify(invoiceData));
+		if (selectedImage) {
+			localStorage.setItem('selectedImage', selectedImage); // Save selected image
 		}
-	];
-
-	let subTotal = 0;
-	let totalDue = 0;
+	}
 
 	onMount(() => {
-		subTotal = 0;
-		totalDue = 0;
-		for (let item of invoiceItems) {
-			subTotal += item.unitPrice * item.quantity;
+		// Load data from local storage when the component mounts
+		const savedData = localStorage.getItem('invoiceData');
+		if (savedData) {
+			invoiceData = JSON.parse(savedData); // Parse saved data
 		}
-		totalDue = subTotal + billedBy.invoiceDetails.tax * subTotal;
+
+		const savedImage = localStorage.getItem('selectedImage');
+		if (savedImage) {
+			selectedImage = savedImage; // Load saved image
+		}
 	});
 
 	let itemDesc = '';
@@ -76,17 +88,15 @@
 	let itemQty = 1;
 	$: itemTotal = itemPrice * itemQty;
 
-	function updateCart() {
-		subTotal = invoiceItems.reduce((total, item) => {
-			return total + item.unitPrice * item.quantity;
-		}, 0);
-		totalDue = subTotal + billedBy.invoiceDetails.tax * subTotal;
-	}
+	$: subTotal = invoiceData.invoiceItems.reduce((total, item) => {
+		return total + item.unitPrice * item.quantity;
+	}, 0);
+	$: totalDue = subTotal + invoiceData.billedBy.invoiceDetails.tax * subTotal;
 
 	function addItem() {
 		if (itemDesc != '' && itemPrice > 0 && itemQty > 0) {
-			invoiceItems = [
-				...invoiceItems,
+			invoiceData.invoiceItems = [
+				...invoiceData.invoiceItems,
 				{
 					description: itemDesc,
 					unitPrice: itemPrice,
@@ -100,16 +110,14 @@
 
 			document.getElementById('descBox').focus();
 
-			updateCart();
+			updateLocalStorage();
 		}
 	}
 
 	function deleteItem(index) {
-		invoiceItems = invoiceItems.filter((_, i) => i !== index);
-		updateCart();
+		invoiceData.invoiceItems = invoiceData.invoiceItems.filter((_, i) => i !== index);
+		updateLocalStorage();
 	}
-
-	let selectedImage = null;
 
 	function handleImageChange(event) {
 		const file = event.target.files[0];
@@ -121,6 +129,7 @@
 			const reader = new FileReader();
 			reader.onload = () => {
 				selectedImage = reader.result;
+				updateLocalStorage();
 			};
 			reader.readAsDataURL(file);
 		} else {
@@ -134,6 +143,8 @@
 
 	const tableItemStyle = 'border px-2 py-4 break-words text-pretty';
 </script>
+
+<svelte:body on:click={() => updateLocalStorage()} />
 
 <div
 	class="-rotate-2 max-w-screen-md mx-auto my-16 px-6 py-8 flex flex-col space-y-6 font-inter bg-white shadow-lg"
@@ -236,7 +247,12 @@
 					</button>
 				{/if}
 			</div>
-			<p class="font-bold text-2xl text-[#1E6F5C]">{billedBy.company}</p>
+			<input
+				class="font-bold text-2xl text-[#1E6F5C]"
+				type="text"
+				bind:value={invoiceData.billedBy.company}
+				on:input={() => updateLocalStorage()}
+			/>
 		</div>
 
 		<!-- Right Section -->
@@ -248,7 +264,8 @@
 				contenteditable="true"
 				class="w-32"
 				maxlength="12"
-				bind:value={billedBy.invoiceDetails.date}
+				on:input={() => updateLocalStorage()}
+				bind:value={invoiceData.billedBy.invoiceDetails.date}
 			/>
 		</div>
 	</div>
@@ -259,21 +276,69 @@
 	<div class="flex flex-row justify-between">
 		<div>
 			<p class="font-bold">Address :</p>
-			<p contenteditable="true" bind:innerText={billedBy.company}></p>
-			<p contenteditable="true" bind:innerText={billedBy.address.apartment}></p>
-			<p contenteditable="true" bind:innerText={billedBy.address.street}></p>
-			<p contenteditable="true" bind:innerText={billedBy.address.city}></p>
-			<p contenteditable="true" bind:innerText={billedBy.address.state}></p>
-			<p contenteditable="true" bind:innerText={billedBy.address.pincode}></p>
+			<p
+				on:input={() => updateLocalStorage()}
+				contenteditable="true"
+				bind:innerText={invoiceData.billedBy.company}
+			></p>
+			<p
+				on:input={() => updateLocalStorage()}
+				contenteditable="true"
+				bind:innerText={invoiceData.billedBy.address.apartment}
+			></p>
+			<p
+				on:input={() => updateLocalStorage()}
+				contenteditable="true"
+				bind:innerText={invoiceData.billedBy.address.street}
+			></p>
+			<p
+				on:input={() => updateLocalStorage()}
+				contenteditable="true"
+				bind:innerText={invoiceData.billedBy.address.city}
+			></p>
+			<p
+				on:input={() => updateLocalStorage()}
+				contenteditable="true"
+				bind:innerText={invoiceData.billedBy.address.state}
+			></p>
+			<p
+				on:input={() => updateLocalStorage()}
+				contenteditable="true"
+				bind:innerText={invoiceData.billedBy.address.pincode}
+			></p>
 		</div>
 		<div>
 			<p class="font-bold">To :</p>
-			<p contenteditable="true" bind:innerText={billedTo.company}></p>
-			<p contenteditable="true" bind:innerText={billedTo.address.apartment}></p>
-			<p contenteditable="true" bind:innerText={billedTo.address.street}></p>
-			<p contenteditable="true" bind:innerText={billedTo.address.city}></p>
-			<p contenteditable="true" bind:innerText={billedTo.address.state}></p>
-			<p contenteditable="true" bind:innerText={billedTo.address.pincode}></p>
+			<p
+				on:input={() => updateLocalStorage()}
+				contenteditable="true"
+				bind:innerText={invoiceData.billedTo.company}
+			></p>
+			<p
+				on:input={() => updateLocalStorage()}
+				contenteditable="true"
+				bind:innerText={invoiceData.billedTo.address.apartment}
+			></p>
+			<p
+				on:input={() => updateLocalStorage()}
+				contenteditable="true"
+				bind:innerText={invoiceData.billedTo.address.street}
+			></p>
+			<p
+				on:input={() => updateLocalStorage()}
+				contenteditable="true"
+				bind:innerText={invoiceData.billedTo.address.city}
+			></p>
+			<p
+				on:input={() => updateLocalStorage()}
+				contenteditable="true"
+				bind:innerText={invoiceData.billedTo.address.state}
+			></p>
+			<p
+				on:input={() => updateLocalStorage()}
+				contenteditable="true"
+				bind:innerText={invoiceData.billedTo.address.pincode}
+			></p>
 		</div>
 	</div>
 
@@ -347,7 +412,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each invoiceItems as item, index}
+			{#each invoiceData.invoiceItems as item, index}
 				<button
 					on:click={() => {
 						deleteItem(index);
@@ -411,7 +476,8 @@
 				<td
 					class="{tableItemStyle} text-right"
 					contenteditable="true"
-					bind:innerText={billedBy.invoiceDetails.tax}
+					on:input={() => updateCart()}
+					bind:innerText={invoiceData.billedBy.invoiceDetails.tax}
 				></td>
 			</tr>
 			<tr>
@@ -425,7 +491,8 @@
 		<span
 			class="p-2 w-60 h-auto break-words text-pretty shadow-inner border bg-gray-50"
 			contenteditable="true"
-			bind:innerText={billedBy.invoiceDetails.note}
+			bind:innerText={invoiceData.billedBy.invoiceDetails.note}
+			on:input={() => updateLocalStorage()}
 		></span>
 	</div>
 
@@ -437,21 +504,43 @@
 		<div>
 			<h4 class="font-bold my-4">Payment Info</h4>
 			<p>
-				Account : <span contenteditable="true" bind:innerText={billedBy.bankDetails.accountNumber}
+				Account : <span
+					contenteditable="true"
+					on:input={() => updateLocalStorage()}
+					bind:innerText={invoiceData.billedBy.bankDetails.accountNumber}
 				></span>
 			</p>
 			<p>
-				A/C Name : <span contenteditable="true" bind:innerText={billedBy.bankDetails.accountName}
+				A/C Name : <span
+					contenteditable="true"
+					on:input={() => updateLocalStorage()}
+					bind:innerText={invoiceData.billedBy.bankDetails.accountName}
 				></span>
 			</p>
 			<p>
-				Bank : <span contenteditable="true" bind:innerText={billedBy.bankDetails.bankName}></span>
+				Bank : <span
+					contenteditable="true"
+					on:input={() => updateLocalStorage()}
+					bind:innerText={invoiceData.billedBy.bankDetails.bankName}
+				></span>
 			</p>
 		</div>
 		<div>
 			<h4 class="font-bold my-4">Questions?</h4>
-			<p>Email : <span contenteditable="true" bind:innerText={billedBy.contact.email}></span></p>
-			<p>Phone : <span contenteditable="true" bind:innerText={billedBy.contact.phone}></span></p>
+			<p>
+				Email : <span
+					on:input={() => updateLocalStorage()}
+					contenteditable="true"
+					bind:innerText={invoiceData.billedBy.contact.email}
+				></span>
+			</p>
+			<p>
+				Phone : <span
+					on:input={() => updateLocalStorage()}
+					contenteditable="true"
+					bind:innerText={invoiceData.billedBy.contact.phone}
+				></span>
+			</p>
 		</div>
 	</div>
 </div>
