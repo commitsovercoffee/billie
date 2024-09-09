@@ -1,18 +1,16 @@
 <script>
 	import '../app.css';
+	import Header from '$lib/components/Header.svelte';
+	import Footer from '$lib/components/Footer.svelte';
 
 	// Supports weights 100-900
 	import '@fontsource-variable/inter';
-
-	const creditStyle = 'underline underline-offset-8 decoration-dashed';
 </script>
 
+<Header
+	title="No Strings Attached Invoice Generator"
+	subtitle="Create and download invoices instantly, with zero signups or tracking."
+/>
+
 <slot />
-<footer class="print:hidden">
-	<p id="credits" class="p-2 m-2 my-12 text-center align-middle text-stone-800">
-		© 2024
-		<a class={creditStyle} href="https://github.com/commitsovercoffee/bill-me">bill-me</a>
-		· Built by
-		<a class={creditStyle} href="https://commitsovercoffee.com">commitsovercoffee</a>
-	</p>
-</footer>
+<Footer repo="billie" />

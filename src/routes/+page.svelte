@@ -203,10 +203,18 @@
 	const tableItemStyle = 'border px-2 py-4 break-words text-pretty';
 </script>
 
+<svelte:head>
+	<title>Billie - No Strings Attached Invoice Generator</title>
+	<meta
+		name="description"
+		content="Create and download invoices instantly, with zero signups or tracking."
+	/>
+</svelte:head>
+
 <svelte:body on:click={() => updateLocalStorage()} />
 
 <div
-	class="print:rotate-0 print:m-0 -rotate-1 max-w-screen-md mx-auto my-16 px-6 py-8 flex flex-col space-y-6 font-inter bg-white print:shadow-none shadow-lg"
+	class="print:rotate-0 print:m-0 -rotate-1 max-w-screen-md mx-auto -mt-20 px-6 py-8 flex flex-col space-y-6 font-inter bg-white print:shadow-none shadow-lg"
 >
 	<!-- Company & Invoice Row ------------------------------------------->
 	<div class="flex flex-row justify-between">
