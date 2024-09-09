@@ -406,7 +406,7 @@
 	<!-- Address Row ----------------------------------------------------->
 	<div class="flex flex-row justify-between">
 		<div>
-			<p class="font-bold">Address :</p>
+			<p class="font-bold">From :</p>
 			<p
 				on:input={() => updateLocalStorage()}
 				contenteditable="true"
@@ -623,7 +623,7 @@
 
 	<div class="flex flex-row justify-between">
 		<span
-			class="p-2 w-60 h-auto break-words text-pretty shadow-inner border bg-gray-50"
+			class="break-inside-avoid-page p-2 w-60 h-auto break-words text-pretty shadow-inner border bg-gray-50"
 			contenteditable="true"
 			bind:innerText={invoiceData.billedBy.invoiceDetails.note}
 			on:input={() => updateLocalStorage()}

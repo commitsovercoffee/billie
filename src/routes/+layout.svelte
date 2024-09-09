@@ -11,6 +11,5 @@
 	title="No Strings Attached Invoice Generator"
 	subtitle="Create and download invoices instantly, with zero signups or tracking."
 />
-
 <slot />
 <Footer repo="billie" />

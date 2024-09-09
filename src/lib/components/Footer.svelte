@@ -5,7 +5,7 @@
 </script>
 
 <footer class="print:hidden text-stone-800 my-16">
-	<p id="credits" class="p-2 m-2 text-center">
+	<p class="p-2 m-2 text-center">
 		© {date.getFullYear()}
 		<a
 			target="_blank"
