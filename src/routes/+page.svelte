@@ -45,6 +45,7 @@
 			itemQty = 1;
 
 			save();
+			document.getElementById('descBox').focus();
 		}
 	}
 
