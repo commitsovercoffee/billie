@@ -1,5 +1,13 @@
 <script>
+	import { LucidePlus, Trash2 } from 'lucide-svelte';
+	import { ImageUp } from 'lucide-svelte';
+	import { RotateCcw } from 'lucide-svelte';
+	import { Printer } from 'lucide-svelte';
+
 	import { onMount } from 'svelte';
+	import Details from '$lib/components/Details.svelte';
+
+	import TextBox from '$lib/components/TextBox.svelte';
 
 	// Default invoiceData object
 	let invoiceData = {
@@ -78,7 +86,7 @@
 					number: 2,
 					created: 'May 24, 2014',
 					due: 'May 24, 2014',
-					tax: 0.18,
+					tax: 18,
 					note: "Please note: Due to a mishap with Russ's bottle being on delete, some files were accidentally removed."
 				}
 			},
@@ -199,8 +207,6 @@
 	function clearImage() {
 		selectedImage = null;
 	}
-
-	const tableItemStyle = 'border px-2 py-4 break-words text-pretty';
 </script>
 
 <svelte:head>
@@ -216,57 +222,19 @@
 <div
 	class="print:rotate-0 print:m-0 -rotate-1 max-w-screen-md mx-auto -mt-20 px-6 py-8 flex flex-col space-y-6 font-inter bg-white print:shadow-none shadow-lg"
 >
-	<!-- Company & Invoice Row ------------------------------------------->
 	<div class="flex flex-row justify-between">
-		<!-- Left Section --->
+		<!-- Company Details ----------------------------------------->
+
 		<div class="flex flex-col gap-4">
 			<div>
-				<!-- Company Logo -->
 				{#if selectedImage}
 					<div class="flex flex-row items-center print:space-x-0 space-x-4">
 						<div class="print:hidden flex flex-col border rounded-xl shadow-md">
-							<button on:click={clearImage}>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									class="m-4 cursor-pointer lucide lucide-trash-2"
-									><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path
-										d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"
-									/><line x1="10" x2="10" y1="11" y2="17" /><line
-										x1="14"
-										x2="14"
-										y1="11"
-										y2="17"
-									/></svg
-								>
+							<button class="p-2" on:click={clearImage}>
+								<Trash2 />
 							</button>
-							<button on:click={() => document.getElementById('imageInput').click()}>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									class="m-4 cursor-pointer lucide lucide-image-up"
-									><path
-										d="M10.3 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10l-3.1-3.1a2 2 0 0 0-2.814.014L6 21"
-									/><path d="m14 19.5 3-3 3 3" /><path d="M17 22v-5.5" /><circle
-										cx="9"
-										cy="9"
-										r="2"
-									/></svg
-								>
+							<button class="p-2" on:click={() => document.getElementById('imageInput').click()}>
+								<ImageUp />
 								<input
 									id="imageInput"
 									type="file"
@@ -284,25 +252,7 @@
 						class="print:hidden p-2 flex flex-row gap-2 rounded-lg shadow-md border cursor-pointer"
 						on:click={() => document.getElementById('imageInput').click()}
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="lucide lucide-image-up"
-							><path
-								d="M10.3 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10l-3.1-3.1a2 2 0 0 0-2.814.014L6 21"
-							/><path d="m14 19.5 3-3 3 3" /><path d="M17 22v-5.5" /><circle
-								cx="9"
-								cy="9"
-								r="2"
-							/></svg
-						>
+						<ImageUp />
 						<p>Click to select an image for logo</p>
 						<input
 							id="imageInput"
@@ -322,13 +272,18 @@
 			/>
 		</div>
 
-		<!-- Right Section -->
+		<!-- Invoice Number & Date ----------------------------------->
+
 		<div class="relative flex flex-col items-end gap-1">
 			<h2 class="font-bold text-2xl text-[#1E6F5C] text-right">
-				INVOICE #<span
-					contenteditable="true"
-					bind:innerText={invoiceData.billedBy.invoiceDetails.number}
-				></span>
+				INVOICE :
+				<input
+					on:input={() => updateLocalStorage()}
+					type="text"
+					size="2"
+					placeholder="2341"
+					maxlength="4"
+				/>
 			</h2>
 			<div class="flex flex-col space-y-2 absolute -right-20">
 				<button
@@ -337,21 +292,7 @@
 					}}
 					class="print:hidden rounded-lg p-2 bg-white shadow cursor-pointer active:scale-90 transition-all duration-100 ease-in"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="24"
-						height="24"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="#295F98"
-						stroke-width="1.5"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						class="lucide lucide-rotate-ccw"
-						><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path
-							d="M3 3v5h5"
-						/></svg
-					>
+					<RotateCcw />
 				</button>
 				<button
 					on:click={() => {
@@ -359,44 +300,28 @@
 					}}
 					class="print:hidden rounded-lg p-2 bg-white shadow cursor-pointer active:scale-90 transition-all duration-100 ease-in"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="24"
-						height="24"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="#424242"
-						stroke-width="1.5"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						class="lucide lucide-printer"
-						><path
-							d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
-						/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6" /><rect
-							x="6"
-							y="14"
-							width="12"
-							height="8"
-							rx="1"
-						/></svg
-					>
+					<Printer />
 				</button>
 			</div>
 			<p>
 				Created :
-				<span
-					contenteditable="true"
+				<input
 					on:input={() => updateLocalStorage()}
-					bind:innerText={invoiceData.billedBy.invoiceDetails.created}
-				></span>
+					type="text"
+					size="10"
+					placeholder="May 24,2014"
+					maxlength="13"
+				/>
 			</p>
 			<p>
 				Due :
-				<span
-					contenteditable="true"
+				<input
 					on:input={() => updateLocalStorage()}
-					bind:innerText={invoiceData.billedBy.invoiceDetails.due}
-				></span>
+					type="text"
+					size="10"
+					placeholder="May 24,2014"
+					maxlength="13"
+				/>
 			</p>
 		</div>
 	</div>
@@ -404,76 +329,13 @@
 	<hr />
 
 	<!-- Address Row ----------------------------------------------------->
+
 	<div class="flex flex-row justify-between">
-		<div>
-			<p class="font-bold">From :</p>
-			<p
-				on:input={() => updateLocalStorage()}
-				contenteditable="true"
-				bind:innerText={invoiceData.billedBy.company}
-			></p>
-			<p
-				on:input={() => updateLocalStorage()}
-				contenteditable="true"
-				bind:innerText={invoiceData.billedBy.address.apartment}
-			></p>
-			<p
-				on:input={() => updateLocalStorage()}
-				contenteditable="true"
-				bind:innerText={invoiceData.billedBy.address.street}
-			></p>
-			<p
-				on:input={() => updateLocalStorage()}
-				contenteditable="true"
-				bind:innerText={invoiceData.billedBy.address.city}
-			></p>
-			<p
-				on:input={() => updateLocalStorage()}
-				contenteditable="true"
-				bind:innerText={invoiceData.billedBy.address.state}
-			></p>
-			<p
-				on:input={() => updateLocalStorage()}
-				contenteditable="true"
-				bind:innerText={invoiceData.billedBy.address.pincode}
-			></p>
-		</div>
-		<div>
-			<p class="font-bold">To :</p>
-			<p
-				on:input={() => updateLocalStorage()}
-				contenteditable="true"
-				bind:innerText={invoiceData.billedTo.company}
-			></p>
-			<p
-				on:input={() => updateLocalStorage()}
-				contenteditable="true"
-				bind:innerText={invoiceData.billedTo.address.apartment}
-			></p>
-			<p
-				on:input={() => updateLocalStorage()}
-				contenteditable="true"
-				bind:innerText={invoiceData.billedTo.address.street}
-			></p>
-			<p
-				on:input={() => updateLocalStorage()}
-				contenteditable="true"
-				bind:innerText={invoiceData.billedTo.address.city}
-			></p>
-			<p
-				on:input={() => updateLocalStorage()}
-				contenteditable="true"
-				bind:innerText={invoiceData.billedTo.address.state}
-			></p>
-			<p
-				on:input={() => updateLocalStorage()}
-				contenteditable="true"
-				bind:innerText={invoiceData.billedTo.address.pincode}
-			></p>
-		</div>
+		<TextBox heading="From" />
+		<TextBox heading="To" />
 	</div>
 
-	<!-- Bill Details Row ------------------------------------------------>
+	<!-- New Item Form --------------------------------------------------->
 
 	<form class="print:hidden flex flex-row justif-between gap-2">
 		<button
@@ -483,18 +345,7 @@
 			}}
 			class="absolute -ml-20 print:hidden rounded-full p-2 bg-white shadow cursor-pointer active:scale-90 transition-all duration-100 ease-in"
 		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="24"
-				height="24"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="#557571"
-				stroke-width="1.8"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				class="lucide lucide-plus"><path d="M5 12h14" /><path d="M12 5v14" /></svg
-			>
+			<LucidePlus stroke="#557571" />
 		</button>
 
 		<input
@@ -533,148 +384,157 @@
 		</p>
 	</form>
 
-	<table class="table-auto realtive">
-		<thead>
-			<tr class="bg-[#1E6F5C] text-white">
-				<th class={tableItemStyle}>Item Description</th>
-				<th class={tableItemStyle}>Unit Price</th>
-				<th class={tableItemStyle}>Qty</th>
-				<th class={tableItemStyle}>Total</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#each invoiceData.invoiceItems as item, index}
+	<!-- Table ----------------------------------------------------------->
+
+	<div class="flex flex-col">
+		<div class="flex flex-row bg-[#1e6f5c]">
+			<p class="font-bold text-white p-2 border grow break-all">Item Description</p>
+			<input
+				disabled
+				class="p-2 bg-inherit border placeholder:font-bold placeholder:text-white"
+				maxlength="7"
+				size="6"
+				type="text"
+				placeholder="Unit Price"
+			/>
+			<input
+				disabled
+				class="p-2 bg-inherit border placeholder:font-bold placeholder:text-white"
+				maxlength="4"
+				size="4"
+				type="text"
+				placeholder="Qty"
+			/>
+			<input
+				disabled
+				class="p-2 bg-inherit border placeholder:font-bold placeholder:text-white"
+				maxlength="4"
+				size="12"
+				type="text"
+				placeholder="Total"
+			/>
+		</div>
+		{#each invoiceData.invoiceItems as item, index}
+			<div class="flex flex-row even:bg-gray-50 break-all">
 				<button
 					on:click={() => {
 						deleteItem(index);
 					}}
 					class="absolute -ml-20 print:hidden rounded-full p-2 bg-white shadow cursor-pointer active:scale-90 transition-all duration-100 ease-in"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="24"
-						height="24"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="#C96868"
-						stroke-width="1.8"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						class="lucide lucide-trash-2"
-						><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path
-							d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"
-						/><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg
-					>
+					<Trash2 color="#C96868" />
 				</button>
-				<tr class="my-2 {index % 2 != 0 && 'bg-gray-100'}">
-					<td
-						on:keydown={(e) => {
-							e.key == 'Delete' && deleteItem(index);
-						}}
-						class={tableItemStyle}
-						contenteditable="true"
-						bind:innerText={item.description}
-					>
-					</td>
-					<td
-						on:keydown={(e) => {
-							e.key == 'Delete' && deleteItem(index);
-						}}
-						class="{tableItemStyle} text-right"
-						contenteditable="true"
-						bind:innerText={item.unitPrice}
-					></td>
-					<td
-						on:keydown={(e) => {
-							e.key == 'Delete' && deleteItem(index);
-						}}
-						class="{tableItemStyle} text-center"
-						contenteditable="true"
-						bind:innerText={item.quantity}
-					></td>
-					<td
-						on:keydown={(e) => {
-							e.key == 'Delete' && deleteItem(index);
-						}}
-						class="{tableItemStyle} text-right">{item.unitPrice * item.quantity}</td
-					>
-				</tr>
-			{/each}
-		</tbody><tfoot>
-			<tr>
-				<th class="{tableItemStyle} text-right" scope="row" colspan="3">Subtotal</th>
-				<td class="{tableItemStyle} text-right">{subTotal}</td>
-			</tr>
-			<tr>
-				<th class="{tableItemStyle} text-right" scope="row" colspan="3">Tax</th>
-				<td
-					class="{tableItemStyle} text-right"
-					contenteditable="true"
-					on:input={() => updateLocalStorage()}
-					bind:innerText={invoiceData.billedBy.invoiceDetails.tax}
-				></td>
-			</tr>
-			<tr>
-				<th class="{tableItemStyle} text-right" scope="row" colspan="3">Total Due</th>
-				<td class="{tableItemStyle} text-right">{totalDue}</td>
-			</tr>
-		</tfoot>
-	</table>
 
-	<div class="flex flex-row justify-between">
-		<span
-			class="break-inside-avoid-page p-2 w-60 h-auto break-words text-pretty shadow-inner border bg-gray-50"
-			contenteditable="true"
-			bind:innerText={invoiceData.billedBy.invoiceDetails.note}
-			on:input={() => updateLocalStorage()}
-		></span>
+				<p contenteditable="true" class="p-2 border grow break-all">{item.description}</p>
+				<input class="p-2 border" maxlength="7" size="6" type="text" bind:value={item.unitPrice} />
+				<input class="p-2 border" maxlength="4" size="4" type="text" bind:value={item.quantity} />
+				<input
+					disabled
+					class="p-2 border"
+					maxlength="4"
+					size="12"
+					type="text"
+					placeholder={item.unitPrice * item.quantity}
+				/>
+			</div>
+		{/each}
+
+		<div class="flex flex-row even:bg-gray-50 break-all">
+			<p class="p-2 border grow break-all text-right font-bold">Subtotal</p>
+			<input
+				disabled
+				class="p-2 border"
+				maxlength="2"
+				size="12"
+				type="text"
+				placeholder={subTotal}
+			/>
+		</div>
+		<div class="flex flex-row even:bg-gray-50 break-all">
+			<p class="p-2 border grow break-all text-right font-bold">Tax</p>
+			<input
+				class="p-2 border"
+				maxlength="2"
+				size="12"
+				type="text"
+				bind:value={invoiceData.billedBy.invoiceDetails.tax}
+			/>
+		</div>
+		<div class="flex flex-row even:bg-gray-50 break-all">
+			<p class="p-2 border grow break-all text-right font-bold">Total Due</p>
+			<input
+				disabled
+				class="p-2 border"
+				maxlength="2"
+				size="12"
+				type="text"
+				placeholder={totalDue}
+			/>
+		</div>
 	</div>
 
-	<p>Thank you for your business</p>
+	<!-- Additional Details  --------------------------------------------->
 
+	<TextBox heading="Note" />
+	<p>Thank you for your business</p>
 	<hr />
 
 	<div class="flex flex-row justify-between">
-		<div>
-			<h4 class="font-bold my-4">Payment Info</h4>
-			<p>
-				Account : <span
-					contenteditable="true"
-					on:input={() => updateLocalStorage()}
-					bind:innerText={invoiceData.billedBy.bankDetails.accountNumber}
-				></span>
-			</p>
-			<p>
-				A/C Name : <span
-					contenteditable="true"
-					on:input={() => updateLocalStorage()}
-					bind:innerText={invoiceData.billedBy.bankDetails.accountName}
-				></span>
-			</p>
-			<p>
-				Bank : <span
-					contenteditable="true"
-					on:input={() => updateLocalStorage()}
-					bind:innerText={invoiceData.billedBy.bankDetails.bankName}
-				></span>
-			</p>
-		</div>
-		<div>
-			<h4 class="font-bold my-4">Questions?</h4>
-			<p>
-				Email : <span
-					on:input={() => updateLocalStorage()}
-					contenteditable="true"
-					bind:innerText={invoiceData.billedBy.contact.email}
-				></span>
-			</p>
-			<p>
-				Phone : <span
-					on:input={() => updateLocalStorage()}
-					contenteditable="true"
-					bind:innerText={invoiceData.billedBy.contact.phone}
-				></span>
-			</p>
-		</div>
+		<Details
+			heading="Payment Info"
+			data={[
+				{
+					label: 'Account',
+					value: '',
+					placeholder: '987654321098',
+					type: 'text', // text, tel, email
+					pattern: '.+@example.com',
+					minlength: 0,
+					maxlength: 12
+				},
+				{
+					label: 'A/C Name',
+					value: '',
+					placeholder: 'Piper Piper Inc',
+					type: 'text',
+					pattern: '',
+					minlength: 0,
+					maxlength: 28
+				},
+				{
+					label: 'Bank',
+					value: '',
+					placeholder: 'Silicion Valley Bank',
+					type: 'text',
+					pattern: '',
+					minlength: 0,
+					maxlength: 28
+				}
+			]}
+		/>
+
+		<Details
+			heading="Questions?"
+			data={[
+				{
+					label: 'Email',
+					value: '',
+					placeholder: 'jared.dunn@piedpiper.com',
+					type: 'email', // text, tel, email
+					pattern: '.+@example.com',
+					minlength: 0,
+					maxlength: 28
+				},
+				{
+					label: 'Phone',
+					value: '',
+					placeholder: '+91 9876543210',
+					type: 'tel', // text, tel, email
+					pattern: '[0-9]{3}-[0-9]{3}-[0-9]{4}',
+					minlength: 0,
+					maxlength: 14
+				}
+			]}
+		/>
 	</div>
 </div>
